@@ -1,11 +1,11 @@
-# <img src="icon/icon_512.png" height="60" valign="middle" />&nbsp; orderMetadataViewer
+# <img src="icon/icon_512.png" height="60" valign="middle" /> orderMetadataViewer
 Chrome extension to display hidden Target and Best Buy order metadata.
 
 
 ## Installation
 1. Download the latest release from [Releases](https://github.com/EncryptedCurse/orderMetadataViewer/releases/latest) and unzip it
 2. Enable developer mode in `chrome://extensions`
-3. Click `Load unpacked` and select the `targetMetadata` directory
+3. Click `Load unpacked` and select the `orderMetadataViewer` directory
 
 
 ## Usage
