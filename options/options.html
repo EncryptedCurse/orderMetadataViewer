@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="options.css" />
+	</head>
+	<body>
+		<div id="options">
+			<h3>General</h3>
+			<section>
+				<div>
+					<input type="checkbox" id="clearConsole" name="clearConsole" />
+					<label for="clearConsole">Clear console before logging</label>
+				</div>
+				<div>
+					<input type="checkbox" id="logAll" name="logAll" />
+					<label for="logAll">Log original response object</label>
+				</div>
+			</section>
+			<hr />
+			<h3>Modules</h3>
+			<section>
+				<div>
+					<input type="checkbox" id="targetModule" name="targetModule" />
+					<label for="targetModule">Target</label>
+				</div>
+				<div>
+					<input type="checkbox" id="bestBuyModule" name="bestBuyModule" />
+					<label for="bestBuyModule">Best Buy</label>
+				</div>
+			</section>
+			<hr />
+			<button id="save" type="submit">Save</button>
+		</div>
+		<script src="options.js"></script>
+	</body>
+</html>

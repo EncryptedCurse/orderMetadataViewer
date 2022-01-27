@@ -1,0 +1,27 @@
+{
+	"manifest_version": 3,
+	"name": "orderMetadataViewer",
+	"description": "Display Target and Best Buy order metadata",
+	"author": "EncryptedCurse",
+	"version": "1.0",
+	"content_scripts": [
+		{
+			"js": ["util.js", "sites/targetMetadata.js"],
+			"matches": ["*://*.target.com/account/orders/*"],
+			"run_at": "document_start"
+		},
+		{
+			"js": ["util.js", "sites/bestBuyMetadata.js"],
+			"matches": ["*://*.bestbuy.com/profile/ss/orders/order-details/*"],
+			"run_at": "document_start"
+		}
+	],
+	"options_ui": {
+		"page": "options/options.html",
+		"open_in_tab": false
+	},
+	"permissions": ["storage"],
+	"icons": {
+		"512": "icon/icon_512.png"
+	}
+}
