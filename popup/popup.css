@@ -1,0 +1,25 @@
+body {
+	min-width: 375px;
+}
+
+table, td, th {
+	border: 0.5px solid lightgray;
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+td {
+	padding: 5px;
+}
+
+table td + td {
+	font-family: monospace;
+	font-size: 1.4em;
+}
+
+.itemMetadataHeading {
+	font-weight: 500;
+}

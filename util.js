@@ -1,48 +1,25 @@
-const styles = {
-	header: 'font-weight: bold',
-	title: 'font-style: italic',
-	reset: 'all: unset',
-};
-
-const failMessage = '❌ Failed to display order metadata!';
-
-function untilNotNull(condition) {
-	return new Promise((resolve) => {
-		let interval = setInterval(() => {
-			const result = condition();
-			if (!result) {
-				return;
-			} else {
-				clearInterval(interval);
-				resolve(result);
-			}
-		}, 200);
-	});
+export function getActiveTab() {
+	return new Promise((resolve) =>
+		chrome.tabs.query(
+			{
+				active: true,
+				currentWindow: true,
+			},
+			(tabs) => resolve(tabs[0])
+		)
+	);
 }
 
-function trigger(orderNumberRegex) {
-	document.addEventListener('DOMContentLoaded', async () => {
-		await untilNotNull(() => window.location.pathname.match(orderNumberRegex)).then((orderNumberMatch) =>
-			run(orderNumberMatch[1])
-		);
-	});
+export function fetchData(url, options) {
+	return new Promise((resolve) =>
+		chrome.runtime.sendMessage({ url, options }, (response) => resolve(response))
+	);
 }
 
-function log(objArray) {
-	let strArray = [],
-		argsArray = [];
-
-	for (const obj of objArray) {
-		if (obj) {
-			if (obj.hasOwnProperty('header')) {
-				strArray.push(`%c${obj.header}%c`);
-				argsArray.push(styles.header, styles.reset);
-			} else if (obj.hasOwnProperty('title')) {
-				strArray.push(`%c• ${obj.title}:%c ${obj.text}`);
-				argsArray.push(styles.title, styles.reset);
-			}
-		}
-	}
-
-	console.log(strArray.join('\n'), ...argsArray);
+export function insertTableEntry(table, entry) {
+	const newRow = table.insertRow();
+	const newTitleCell = newRow.insertCell();
+	newTitleCell.innerHTML = entry.attribute;
+	const newTextCell = newRow.insertCell();
+	newTextCell.innerHTML = entry.value;
 }
