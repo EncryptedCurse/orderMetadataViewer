@@ -6,12 +6,21 @@
 		<link rel="stylesheet" href="popup.css" />
 	</head>
 	<body>
-		<div id="orderMetadataDiv">
-			<h2>Order metadata</h2>
-			<table id="orderMetadataTable"></table>
+		<div id="loadingContainer">
+			<div class="spinner"></div>
+			<h3>Loading...</h3>
 		</div>
-		<div id="itemMetadataDiv">
-			<h2>Item metadata</h2>
+		<div id="errorContainer">
+			<h3 id="errorMessage"></h3>
+		</div>
+		<div id="metadataContainer">
+			<div id="orderMetadataContainer">
+				<h2 class="orderMetadataHeading">Order metadata</h2>
+				<table id="orderMetadataTable"></table>
+			</div>
+			<div id="itemMetadataContainer">
+				<h2>Item metadata</h2>
+			</div>
 		</div>
 		<script src="popup.js" type="module"></script>
 	</body>

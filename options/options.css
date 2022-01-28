@@ -1,9 +1,5 @@
-:root {
-	--checkboxSize: 20px;
-	--bodySidePadding: 5px;
-}
-
 body {
+	--bodySidePadding: 5px;
 	padding-left: var(--bodySidePadding);
 	padding-right: var(--bodySidePadding);
 	font-size: 0.95rem;
@@ -25,6 +21,7 @@ input[type='checkbox'], label {
 }
 
 input[type='checkbox'] {
+	--checkboxSize: 20px;
 	width: var(--checkboxSize);
 	height: var(--checkboxSize);
 }
@@ -51,8 +48,8 @@ button {
 	width: 100%;
 	padding: 12.5px;
 	background: mediumseagreen;
-	font-weight: bold;
 	color: white;
+	font-weight: bold;
 }
 
 #save:hover {

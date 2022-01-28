@@ -1,10 +1,23 @@
 import { getActiveTab, fetchData, insertTableEntry } from '../util.js';
 import { targetConfig, bestBuyConfig } from '../siteConfig.js';
 
-function handleLoginStatus(isLoggedIn) {
-	if (!isLoggedIn) {
-		window.close();
-		return;
+// get HTML elements
+const loadingContainer = document.getElementById('loadingContainer');
+const errorContainer = document.getElementById('errorContainer');
+const errorMessage = document.getElementById('errorMessage');
+const metadataContainer = document.getElementById('metadataContainer');
+const itemMetadataContainer = document.getElementById('itemMetadataContainer');
+const orderMetadataTable = document.getElementById('orderMetadataTable');
+
+function displayError(type) {
+	document.body.style.backgroundColor = 'crimson';
+	loadingContainer.style.display = 'none';
+	errorContainer.style.display = 'revert';
+
+	switch (type) {
+		case 'unauthorized':
+			errorMessage.innerText = 'Login/refresh required';
+			break;
 	}
 }
 
@@ -41,7 +54,10 @@ function handleLoginStatus(isLoggedIn) {
 
 	if (config == targetConfig) {
 		isLoggedIn = data.message?.toUpperCase() !== 'UNAUTHORIZED';
-		handleLoginStatus(isLoggedIn);
+		if (!isLoggedIn) {
+			displayError('unauthorized');
+			return;
+		}
 
 		orderMetadata = [
 			{
@@ -76,7 +92,10 @@ function handleLoginStatus(isLoggedIn) {
 		}
 	} else if (config == bestBuyConfig) {
 		isLoggedIn = data.customer.status.toUpperCase() === 'AUTHENTICATED';
-		handleLoginStatus(isLoggedIn);
+		if (!isLoggedIn) {
+			displayError('unauthorized');
+			return;
+		}
 
 		orderMetadata = [
 			{
@@ -103,24 +122,26 @@ function handleLoginStatus(isLoggedIn) {
 		}
 	}
 
-	// display order metadata to user
-	const orderMetadataTable = document.getElementById('orderMetadataTable');
+	// populate order metadata table
 	for (const entry of orderMetadata) {
 		insertTableEntry(orderMetadataTable, entry);
 	}
 
-	// display item metadata to user
-	const itemMetadataDiv = document.getElementById('itemMetadataDiv');
+	// create + populate item metadata table(s)
 	for (const [i, itemMetadata] of Object.entries(itemMetadataCollection)) {
 		const itemMetadataHeading = document.createElement('h3');
-		itemMetadataHeading.innerHTML = `Item ${+i + 1} metadata`;
-		itemMetadataHeading.className = 'itemMetadataHeading';
+		itemMetadataHeading.innerHTML = `Item ${+i + 1}`;
+		itemMetadataHeading.className = 'itemMetadataSubheading';
 
 		const itemMetadataTable = document.createElement('table');
 		for (const entry of itemMetadata) {
 			insertTableEntry(itemMetadataTable, entry);
 		}
 
-		itemMetadataDiv.append(itemMetadataHeading, itemMetadataTable);
+		itemMetadataContainer.append(itemMetadataHeading, itemMetadataTable);
 	}
+
+	// hide loading container + show metadata container
+	loadingContainer.style.display = 'none';
+	metadataContainer.style.display = 'revert';
 })();

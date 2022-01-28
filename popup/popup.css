@@ -1,5 +1,6 @@
 body {
 	min-width: 375px;
+	padding: 10px;
 }
 
 table, td, th {
@@ -15,11 +16,48 @@ td {
 	padding: 5px;
 }
 
+/* second column of every table */
 table td + td {
 	font-family: monospace;
 	font-size: 1.4em;
 }
 
-.itemMetadataHeading {
+#errorContainer, #loadingContainer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	gap: 15px;
+}
+
+#errorContainer, #metadataContainer {
+	display: none;
+}
+
+#errorMessage {
+	color: white;
+}
+
+.orderMetadataHeading {
+	margin-top: 0;
+}
+
+.itemMetadataSubheading {
 	font-weight: 500;
 }
+
+.spinner {
+	--spinnerSize: 15px;
+	width: var(--spinnerSize);
+    height: var(--spinnerSize);
+	border: calc(var(--spinnerSize) / 3) solid whitesmoke;
+	border-top-color: dimgray;
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
