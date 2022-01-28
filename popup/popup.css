@@ -34,7 +34,7 @@ table td + td {
 	display: none;
 }
 
-#errorMessage {
+#errorContainer {
 	color: white;
 }
 
@@ -54,6 +54,12 @@ table td + td {
 	border-top-color: dimgray;
 	border-radius: 50%;
 	animation: spin 1s linear infinite;
+}
+
+.extensionOptionsLink {
+	cursor: pointer;
+	text-decoration: underline;
+	text-underline-offset: 30%;
 }
 
 @keyframes spin {

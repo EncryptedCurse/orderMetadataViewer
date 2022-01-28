@@ -8,7 +8,7 @@ chrome.runtime.onInstalled.addListener((details) => {
 	// disable action on all domains by default
 	chrome.action.disable();
 
-	// initialize options with defaults
+	// initialize options with defaults on first install
 	if (details.reason === 'install') {
 		chrome.storage.sync.set({
 			targetModule: true,

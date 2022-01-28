@@ -1,10 +1,11 @@
-import { getActiveTab, fetchData, insertTableEntry } from '../util.js';
+import { getActiveTab, fetchData, formatNumberAsCurrency, insertTableEntry } from '../util.js';
 import { targetConfig, bestBuyConfig } from '../siteConfig.js';
 
 // get HTML elements
 const loadingContainer = document.getElementById('loadingContainer');
 const errorContainer = document.getElementById('errorContainer');
-const errorMessage = document.getElementById('errorMessage');
+const errorTitle = document.getElementById('errorTitle');
+const errorDescription = document.getElementById('errorDescription');
 const metadataContainer = document.getElementById('metadataContainer');
 const itemMetadataContainer = document.getElementById('itemMetadataContainer');
 const orderMetadataTable = document.getElementById('orderMetadataTable');
@@ -15,8 +16,15 @@ function displayError(type) {
 	errorContainer.style.display = 'revert';
 
 	switch (type) {
+		case 'disabled':
+			errorTitle.innerText = 'Module disabled';
+			errorDescription.innerHTML = 'Check <a class="extensionOptionsLink">extension options</a>';
+			document
+				.getElementsByClassName('extensionOptionsLink')[0]
+				.addEventListener('click', () => chrome.runtime.openOptionsPage());
+			break;
 		case 'unauthorized':
-			errorMessage.innerText = 'Login/refresh required';
+			errorTitle.innerText = 'Login/refresh required';
 			break;
 	}
 }
@@ -36,7 +44,7 @@ function displayError(type) {
 	} else if (options.bestBuyModule && bestBuyConfig.urlRegex.test(url)) {
 		config = bestBuyConfig;
 	} else {
-		window.close();
+		displayError('disabled');
 		return;
 	}
 
@@ -76,6 +84,10 @@ function displayError(type) {
 				attribute: 'Payment authorization status',
 				value: data.payment_transactions[0].authorization_status,
 			},
+			{
+				attribute: 'Authorized payment amount',
+				value: formatNumberAsCurrency(data.payment_transactions[0].amount),
+			},
 		];
 
 		for (let i = 0; i < data.order_lines.length; i++) {
@@ -105,6 +117,10 @@ function displayError(type) {
 			{
 				attribute: 'Payment authorization status',
 				value: `${data.order.payments[0].authorizationStatus}<br />${data.order.payments[0].authorizationStatusDescription}`,
+			},
+			{
+				attribute: 'Authorized payment amount',
+				value: formatNumberAsCurrency(data.order.payments[0].authorizedAmount),
 			},
 		];
 

@@ -1,3 +1,9 @@
+const numberFormatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+
+export function formatNumberAsCurrency(number) {
+	return numberFormatter.format(number);
+}
+
 export function getActiveTab() {
 	return new Promise((resolve) =>
 		chrome.tabs.query(
