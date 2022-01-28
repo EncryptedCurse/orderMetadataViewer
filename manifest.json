@@ -17,6 +17,7 @@
 	"permissions": ["storage", "tabs"],
 	"host_permissions": ["*://*.target.com/", "*://*.bestbuy.com/"],
 	"icons": {
+		"128": "icon/icon_128.png",
 		"512": "icon/icon_512.png"
 	}
 }
