@@ -97,8 +97,10 @@ function displayError(type = null) {
 					value: data.payment_transactions[0].authorization_status,
 				},
 				{
-					attribute: 'Authorized payment amount',
-					value: formatNumberAsCurrency(data.payment_transactions[0].amount),
+					attribute: 'Original payment amount',
+					value: formatNumberAsCurrency(
+						+data.summary.grand_total || data.payment_transactions[0].amount
+					),
 				},
 			];
 
@@ -147,8 +149,14 @@ function displayError(type = null) {
 					value: `${data.order.payments[0].authorizationStatus}<br />${data.order.payments[0].authorizationStatusDescription}`,
 				},
 				{
-					attribute: 'Authorized payment amount',
-					value: formatNumberAsCurrency(data.order.payments[0].authorizedAmount),
+					attribute: 'Original payment amount',
+					value: formatNumberAsCurrency(
+						data.order.payments[0].authorizedAmount || data.order.payments[0].amount
+					),
+				},
+				{
+					attribute: 'Sales channel',
+					value: data.order.client.salesChannel,
 				},
 			];
 
