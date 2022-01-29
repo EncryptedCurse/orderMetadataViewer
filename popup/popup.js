@@ -8,7 +8,7 @@ const loadingContainer = document.getElementById('loadingContainer');
 const errorContainer = document.getElementById('errorContainer');
 const errorTitle = document.getElementById('errorTitle');
 const errorDescription = document.getElementById('errorDescription');
-const metadataContainer = document.getElementById('metadataContainer');
+const orderMetadataContainer = document.getElementById('orderMetadataContainer');
 const itemMetadataContainer = document.getElementById('itemMetadataContainer');
 const orderMetadataTable = document.getElementById('orderMetadataTable');
 
@@ -195,7 +195,8 @@ function displayError(type = null) {
 
 		// hide loading container + show metadata container
 		loadingContainer.style.display = 'none';
-		metadataContainer.style.display = 'revert';
+		orderMetadataContainer.style.display = 'revert';
+		if (Object.keys(itemMetadataCollection).length !== 0) itemMetadataContainer.style.display = 'revert';
 	} catch (e) {
 		console.error(e);
 		displayError();

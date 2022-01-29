@@ -30,7 +30,7 @@ table td + td {
 	gap: 15px;
 }
 
-#errorContainer, #metadataContainer {
+#errorContainer, #orderMetadataContainer, #itemMetadataContainer {
 	display: none;
 }
 
