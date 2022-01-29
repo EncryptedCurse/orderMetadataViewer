@@ -151,7 +151,9 @@ function displayError(type = null) {
 				{
 					attribute: 'Original payment amount',
 					value: formatNumberAsCurrency(
-						data.order.payments[0].authorizedAmount || data.order.payments[0].amount
+						data.order.payments[0].authorizedAmount ||
+							data.order.payments[0].amount ||
+							data.order.price.orderTotal
 					),
 				},
 				{
