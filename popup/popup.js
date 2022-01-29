@@ -1,6 +1,8 @@
 import { getActiveTab, fetchData, formatNumberAsCurrency, insertTableEntry } from '../util.js';
 import { targetConfig, bestBuyConfig } from '../siteConfig.js';
 
+const dateFormatter = new Intl.DateTimeFormat('en-US', { dateStyle: 'short', timeStyle: 'long' });
+
 // get HTML elements
 const loadingContainer = document.getElementById('loadingContainer');
 const errorContainer = document.getElementById('errorContainer');
@@ -10,7 +12,7 @@ const metadataContainer = document.getElementById('metadataContainer');
 const itemMetadataContainer = document.getElementById('itemMetadataContainer');
 const orderMetadataTable = document.getElementById('orderMetadataTable');
 
-function displayError(type) {
+function displayError(type = null) {
 	document.body.style.backgroundColor = 'crimson';
 	loadingContainer.style.display = 'none';
 	errorContainer.style.display = 'revert';
@@ -25,6 +27,11 @@ function displayError(type) {
 			break;
 		case 'unauthorized':
 			errorTitle.innerText = 'Login/refresh required';
+			errorDescription.innerText = 'Token expired';
+			break;
+		default:
+			errorTitle.innerText = 'Unknown error encountered';
+			errorDescription.innerText = 'Try again';
 			break;
 	}
 }
@@ -69,6 +76,10 @@ function displayError(type) {
 
 		orderMetadata = [
 			{
+				attribute: 'Submitted date',
+				value: dateFormatter.format(Date.parse(data.placed_date)),
+			},
+			{
 				attribute: 'Fraud status',
 				value: data.fraud_status,
 			},
@@ -91,13 +102,21 @@ function displayError(type) {
 		];
 
 		for (let i = 0; i < data.order_lines.length; i++) {
-			const itemData = data.order_lines[i].fulfillment_spec.status;
+			const itemData = data.order_lines[i];
 
-			if (itemData.key.toUpperCase() === 'STAT_CANCELED') {
+			if (itemData.fulfillment_spec.status.key.toUpperCase() === 'STAT_CANCELED') {
 				itemMetadataCollection[i] = [
 					{
+						attribute: 'DPCI',
+						value: itemData.item.dpci,
+					},
+					{
 						attribute: 'Cancel reason',
-						value: `${itemData.cancel_reason_code}<br />${itemData.cancel_reason_text}<br />${itemData.cancel_reason_code_description}`,
+						value: `${itemData.fulfillment_spec.status.cancel_reason_code}<br />${itemData.fulfillment_spec.status.cancel_reason_text}<br />${itemData.fulfillment_spec.status.cancel_reason_code_description}`,
+					},
+					{
+						attribute: 'Quantity limit',
+						value: itemData.item.max_purchase_limit,
 					},
 				];
 			}
@@ -110,6 +129,14 @@ function displayError(type) {
 		}
 
 		orderMetadata = [
+			{
+				attribute: 'Submitted date',
+				value: dateFormatter.format(Date.parse(data.order.submitted)),
+			},
+			{
+				attribute: 'Modified date',
+				value: dateFormatter.format(Date.parse(data.order.modified)),
+			},
 			{
 				attribute: 'ECC fraud indicator',
 				value: data.order.callCenter.eccFraudIndicator,
@@ -125,13 +152,13 @@ function displayError(type) {
 		];
 
 		for (let i = 0; i < data.order.items.length; i++) {
-			const itemData = data.order.items[i].enterprise;
+			const itemData = data.order.items[i];
 
-			if (itemData.status.toUpperCase() === 'CANCELLED') {
+			if (itemData.enterprise.status.toUpperCase() === 'CANCELLED') {
 				itemMetadataCollection[i] = [
 					{
 						attribute: 'Cancel reason',
-						value: `${itemData.cancelReasonCode}<br />${itemData.cancelReasonDescription}`,
+						value: `${itemData.enterprise.cancelReasonCode}<br />${itemData.enterprise.cancelReasonDescription}`,
 					},
 				];
 			}
