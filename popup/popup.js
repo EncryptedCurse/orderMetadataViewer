@@ -31,160 +31,165 @@ function displayError(type = null) {
 			break;
 		default:
 			errorTitle.innerText = 'Unknown error encountered';
-			errorDescription.innerText = 'Try again';
+			errorDescription.innerText = 'Try again later';
 			break;
 	}
 }
 
 (async () => {
-	const options = await chrome.storage.sync.get(null);
+	try {
+		const options = await chrome.storage.sync.get(null);
 
-	// get URL
-	const tab = await getActiveTab();
-	const url = tab.url;
+		// get URL
+		const tab = await getActiveTab();
+		const url = tab.url;
 
-	// get config based on URL
-	let config;
+		// get config based on URL
+		let config;
 
-	if (options.targetModule && targetConfig.urlRegex.test(url)) {
-		config = targetConfig;
-	} else if (options.bestBuyModule && bestBuyConfig.urlRegex.test(url)) {
-		config = bestBuyConfig;
-	} else {
-		displayError('disabled');
-		return;
-	}
-
-	// get order number from URL
-	const orderNumber = url.match(config.urlRegex)[1];
-
-	// make API request
-	const data = await fetchData(`${config.apiEndpoint}/${orderNumber}`, config.fetchOptions);
-	console.log(data);
-
-	// get relevant metadata
-	let isLoggedIn;
-	let orderMetadata;
-	let itemMetadataCollection = {};
-
-	if (config == targetConfig) {
-		isLoggedIn = data.message?.toUpperCase() !== 'UNAUTHORIZED';
-		if (!isLoggedIn) {
-			displayError('unauthorized');
+		if (options.targetModule && targetConfig.urlRegex.test(url)) {
+			config = targetConfig;
+		} else if (options.bestBuyModule && bestBuyConfig.urlRegex.test(url)) {
+			config = bestBuyConfig;
+		} else {
+			displayError('disabled');
 			return;
 		}
 
-		orderMetadata = [
-			{
-				attribute: 'Submitted date',
-				value: dateFormatter.format(Date.parse(data.placed_date)),
-			},
-			{
-				attribute: 'Fraud status',
-				value: data.fraud_status,
-			},
-			{
-				attribute: 'Soft decline order',
-				value: data.is_softdecline_order,
-			},
-			{
-				attribute: 'Hard decline payment',
-				value: data.is_payment_hard_declined,
-			},
-			{
-				attribute: 'Payment authorization status',
-				value: data.payment_transactions[0].authorization_status,
-			},
-			{
-				attribute: 'Authorized payment amount',
-				value: formatNumberAsCurrency(data.payment_transactions[0].amount),
-			},
-		];
+		// get order number from URL
+		const orderNumber = url.match(config.urlRegex)[1];
 
-		for (let i = 0; i < data.order_lines.length; i++) {
-			const itemData = data.order_lines[i];
+		// make API request
+		const data = await fetchData(`${config.apiEndpoint}/${orderNumber}`, config.fetchOptions);
+		console.log(data);
 
-			if (itemData.fulfillment_spec.status.key.toUpperCase() === 'STAT_CANCELED') {
-				itemMetadataCollection[i] = [
-					{
-						attribute: 'DPCI',
-						value: itemData.item.dpci,
-					},
-					{
-						attribute: 'Cancel reason',
-						value: `${itemData.fulfillment_spec.status.cancel_reason_code}<br />${itemData.fulfillment_spec.status.cancel_reason_text}<br />${itemData.fulfillment_spec.status.cancel_reason_code_description}`,
-					},
-					{
-						attribute: 'Quantity limit',
-						value: itemData.item.max_purchase_limit,
-					},
-				];
+		// get relevant metadata
+		let isLoggedIn;
+		let orderMetadata;
+		let itemMetadataCollection = {};
+
+		if (config == targetConfig) {
+			isLoggedIn = data.message?.toUpperCase() !== 'UNAUTHORIZED';
+			if (!isLoggedIn) {
+				displayError('unauthorized');
+				return;
+			}
+
+			orderMetadata = [
+				{
+					attribute: 'Submitted date',
+					value: dateFormatter.format(Date.parse(data.placed_date)),
+				},
+				{
+					attribute: 'Fraud status',
+					value: data.fraud_status,
+				},
+				{
+					attribute: 'Soft decline order',
+					value: data.is_softdecline_order,
+				},
+				{
+					attribute: 'Hard decline payment',
+					value: data.is_payment_hard_declined,
+				},
+				{
+					attribute: 'Payment authorization status',
+					value: data.payment_transactions[0].authorization_status,
+				},
+				{
+					attribute: 'Authorized payment amount',
+					value: formatNumberAsCurrency(data.payment_transactions[0].amount),
+				},
+			];
+
+			for (let i = 0; i < data.order_lines.length; i++) {
+				const itemData = data.order_lines[i];
+
+				if (itemData.fulfillment_spec.status.key.toUpperCase() === 'STAT_CANCELED') {
+					itemMetadataCollection[i] = [
+						{
+							attribute: 'DPCI',
+							value: itemData.item.dpci,
+						},
+						{
+							attribute: 'Cancel reason',
+							value: `${itemData.fulfillment_spec.status.cancel_reason_code}<br />${itemData.fulfillment_spec.status.cancel_reason_text}<br />${itemData.fulfillment_spec.status.cancel_reason_code_description}`,
+						},
+						{
+							attribute: 'Quantity limit',
+							value: itemData.item.max_purchase_limit,
+						},
+					];
+				}
+			}
+		} else if (config == bestBuyConfig) {
+			isLoggedIn = data.customer.status.toUpperCase() === 'AUTHENTICATED';
+			if (!isLoggedIn) {
+				displayError('unauthorized');
+				return;
+			}
+
+			orderMetadata = [
+				{
+					attribute: 'Submitted date',
+					value: dateFormatter.format(Date.parse(data.order.submitted)),
+				},
+				{
+					attribute: 'Modified date',
+					value: dateFormatter.format(Date.parse(data.order.modified)),
+				},
+				{
+					attribute: 'ECC fraud indicator',
+					value: data.order.callCenter.eccFraudIndicator,
+				},
+				{
+					attribute: 'Payment authorization status',
+					value: `${data.order.payments[0].authorizationStatus}<br />${data.order.payments[0].authorizationStatusDescription}`,
+				},
+				{
+					attribute: 'Authorized payment amount',
+					value: formatNumberAsCurrency(data.order.payments[0].authorizedAmount),
+				},
+			];
+
+			for (let i = 0; i < data.order.items.length; i++) {
+				const itemData = data.order.items[i];
+
+				if (itemData.enterprise.status.toUpperCase() === 'CANCELLED') {
+					itemMetadataCollection[i] = [
+						{
+							attribute: 'Cancel reason',
+							value: `${itemData.enterprise.cancelReasonCode}<br />${itemData.enterprise.cancelReasonDescription}`,
+						},
+					];
+				}
 			}
 		}
-	} else if (config == bestBuyConfig) {
-		isLoggedIn = data.customer.status.toUpperCase() === 'AUTHENTICATED';
-		if (!isLoggedIn) {
-			displayError('unauthorized');
-			return;
+
+		// populate order metadata table
+		for (const entry of orderMetadata) {
+			insertTableEntry(orderMetadataTable, entry);
 		}
 
-		orderMetadata = [
-			{
-				attribute: 'Submitted date',
-				value: dateFormatter.format(Date.parse(data.order.submitted)),
-			},
-			{
-				attribute: 'Modified date',
-				value: dateFormatter.format(Date.parse(data.order.modified)),
-			},
-			{
-				attribute: 'ECC fraud indicator',
-				value: data.order.callCenter.eccFraudIndicator,
-			},
-			{
-				attribute: 'Payment authorization status',
-				value: `${data.order.payments[0].authorizationStatus}<br />${data.order.payments[0].authorizationStatusDescription}`,
-			},
-			{
-				attribute: 'Authorized payment amount',
-				value: formatNumberAsCurrency(data.order.payments[0].authorizedAmount),
-			},
-		];
+		// create + populate item metadata table(s)
+		for (const [i, itemMetadata] of Object.entries(itemMetadataCollection)) {
+			const itemMetadataHeading = document.createElement('h3');
+			itemMetadataHeading.innerHTML = `Item ${+i + 1}`;
+			itemMetadataHeading.className = 'itemMetadataSubheading';
 
-		for (let i = 0; i < data.order.items.length; i++) {
-			const itemData = data.order.items[i];
-
-			if (itemData.enterprise.status.toUpperCase() === 'CANCELLED') {
-				itemMetadataCollection[i] = [
-					{
-						attribute: 'Cancel reason',
-						value: `${itemData.enterprise.cancelReasonCode}<br />${itemData.enterprise.cancelReasonDescription}`,
-					},
-				];
+			const itemMetadataTable = document.createElement('table');
+			for (const entry of itemMetadata) {
+				insertTableEntry(itemMetadataTable, entry);
 			}
-		}
-	}
 
-	// populate order metadata table
-	for (const entry of orderMetadata) {
-		insertTableEntry(orderMetadataTable, entry);
-	}
-
-	// create + populate item metadata table(s)
-	for (const [i, itemMetadata] of Object.entries(itemMetadataCollection)) {
-		const itemMetadataHeading = document.createElement('h3');
-		itemMetadataHeading.innerHTML = `Item ${+i + 1}`;
-		itemMetadataHeading.className = 'itemMetadataSubheading';
-
-		const itemMetadataTable = document.createElement('table');
-		for (const entry of itemMetadata) {
-			insertTableEntry(itemMetadataTable, entry);
+			itemMetadataContainer.append(itemMetadataHeading, itemMetadataTable);
 		}
 
-		itemMetadataContainer.append(itemMetadataHeading, itemMetadataTable);
+		// hide loading container + show metadata container
+		loadingContainer.style.display = 'none';
+		metadataContainer.style.display = 'revert';
+	} catch (e) {
+		console.error(e);
+		displayError();
 	}
-
-	// hide loading container + show metadata container
-	loadingContainer.style.display = 'none';
-	metadataContainer.style.display = 'revert';
 })();
