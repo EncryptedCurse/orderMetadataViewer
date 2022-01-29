@@ -20,9 +20,9 @@ function displayError(type = null) {
 	switch (type) {
 		case 'disabled':
 			errorTitle.innerText = 'Module disabled';
-			errorDescription.innerHTML = 'Check <a class="extensionOptionsLink">extension options</a>';
+			errorDescription.innerHTML = 'Check <a class="link">extension options</a>';
 			document
-				.getElementsByClassName('extensionOptionsLink')[0]
+				.getElementsByClassName('link')[0]
 				.addEventListener('click', () => chrome.runtime.openOptionsPage());
 			break;
 		case 'unauthorized':

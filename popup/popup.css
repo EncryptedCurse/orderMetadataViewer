@@ -56,7 +56,7 @@ table td + td {
 	animation: spin 1s linear infinite;
 }
 
-.extensionOptionsLink {
+.link {
 	cursor: pointer;
 	text-decoration: underline;
 	text-underline-offset: 30%;
