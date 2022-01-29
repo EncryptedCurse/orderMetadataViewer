@@ -10,4 +10,4 @@ Chrome extension to display hidden Target and Best Buy order metadata (e.g., fra
 
 ## Usage
 
-While signed into Target or Best Buy, click the icon from the extensions menu.
+While signed into Target or Best Buy, navigate to an order page and click the icon from the extensions menu.
