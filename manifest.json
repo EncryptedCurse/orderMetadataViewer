@@ -1,6 +1,6 @@
 {
 	"manifest_version": 3,
-	"version": "2.2.3",
+	"version": "2.2.4",
 	"name": "orderMetadataViewer",
 	"description": "Display hidden Target and Best Buy order metadata",
 	"author": "EncryptedCurse",
@@ -15,7 +15,7 @@
 		"service_worker": "background.js",
 		"type": "module"
 	},
-	"permissions": ["storage", "tabs", "declarativeContent"],
+	"permissions": ["storage", "declarativeContent"],
 	"host_permissions": ["*://*.target.com/", "*://*.bestbuy.com/"],
 	"icons": {
 		"128": "icon/icon_128.png",
